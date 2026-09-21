@@ -14,6 +14,8 @@
 #ifndef CORE_BINARY_HPP
 #define CORE_BINARY_HPP
 
+#include "error.hpp"
+
 #include <cstddef>
 #include <cstring>
 #include <expected>
@@ -140,15 +142,13 @@ class Binary
     //!
     //! \param path The path to the binary file.
     //! \return void if successful, a core::Error otherwise.
-    [[nodiscard]] std::expected<void, std::string> load(const std::filesystem::path &path) noexcept;
+    [[nodiscard]] core::Result<void> load(const std::filesystem::path &path) noexcept;
 
     //! \brief Save the binary file to the specified path.
     //!
     //! \param path The path to the binary file.
     //! \return void if successful, a core::Error otherwise.
-    [[nodiscard]] std::expected<void, std::string> save(
-        const std::filesystem::path &path
-    ) const noexcept;
+    [[nodiscard]] core::Result<void> save(const std::filesystem::path &path) const noexcept;
 
     //! \brief Get the path to the binary file.
     //!

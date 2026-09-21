@@ -18,7 +18,6 @@
 #include <expected>
 #include <format>
 #include <print>
-#include <stdexcept>
 
 #if defined(__APPLE__) || defined(_WIN32)
 #include "include/elf.h"
@@ -53,22 +52,22 @@ Binary::Binary(const std::filesystem::path &path)
     auto res = this->load(path);
     if (!res)
     {
-        throw std::runtime_error(res.error());
+        throw std::runtime_error(res.error().message());
     }
 }
 
-std::expected<void, std::string> Binary::load(const std::filesystem::path &path) noexcept
+core::Result<void> Binary::load(const std::filesystem::path &path) noexcept
 {
     std::error_code ec;
     if (!std::filesystem::exists(path, ec) || ec)
     {
-        return std::unexpected(std::format("file '{}' does not exist", path.string()));
+        return std::unexpected(core::Error(std::format("file '{}' does not exist", path.string())));
     }
 
     if (std::filesystem::is_empty(path))
     {
         return std::unexpected(
-            std::format("Binary::load() error: file '{}' is empty", path.string())
+            core::Error(std::format("Binary::load() error: file '{}' is empty", path.string()))
         );
     }
 
@@ -76,7 +75,9 @@ std::expected<void, std::string> Binary::load(const std::filesystem::path &path)
     if (!success)
     {
         return std::unexpected(
-            std::format("Binary::load() error:error loading binary file: {}", success.error())
+            core::Error(
+                std::format("Binary::load() error:error loading binary file: {}", success.error())
+            )
         );
     }
 
@@ -90,17 +91,19 @@ std::expected<void, std::string> Binary::load(const std::filesystem::path &path)
     return {};
 }
 
-std::expected<void, std::string> Binary::save(const std::filesystem::path &path) const noexcept
+core::Result<void> Binary::save(const std::filesystem::path &path) const noexcept
 {
     if (this->data_.empty())
     {
-        return std::unexpected("error saving binary file: no data to save");
+        return std::unexpected(core::Error("error saving binary file: no data to save"));
     }
 
     auto success = utils::io::write_buffer_to_file(this->data_, path);
     if (!success)
     {
-        return std::unexpected(std::format("error saving binary file: {}", success.error()));
+        return std::unexpected(
+            core::Error(std::format("error saving binary file: {}", success.error()))
+        );
     }
 
     return {};

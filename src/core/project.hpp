@@ -14,7 +14,7 @@
 #ifndef CORE_PROJECT_HPP
 #define CORE_PROJECT_HPP
 
-#include "core/binary.hpp"
+#include "binary.hpp"
 #include "error.hpp"
 #include "macros.hpp"
 
