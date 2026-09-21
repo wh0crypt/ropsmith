@@ -143,6 +143,10 @@ if (BUILD_TESTING)
             ropsmith_compiler_flags
         )
 
+        if (NOT MSVC)
+            target_compile_options(test_binary PRIVATE -Wno-old-style-cast)
+        endif()
+
         add_test(NAME test_binary COMMAND test_binary --verbose)
     else()
         message(WARNING "Criterion library not found. Skipping test suite compilation.")
