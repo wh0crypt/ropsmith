@@ -127,6 +127,16 @@ class Error
         );
     }
 
+    //! \brief Explicitly converts the error to a user-facing formatted string.
+    //!
+    //! Delegates to message() to provide a diagnostic.
+    //!
+    //! \return The formatted error string.
+    [[nodiscard]] explicit operator std::string() const
+    {
+        return this->message();
+    }
+
   private:
     std::error_code code_{};
     std::string msg_;
