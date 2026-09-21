@@ -17,6 +17,7 @@
 #include "macros.hpp"
 
 #include <filesystem>
+#include <span>
 
 namespace program
 {
