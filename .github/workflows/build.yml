@@ -44,7 +44,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew update
-          brew install llvm zlib
+          brew install gcc zlib
 
       # --- Windows dependencies via pre-installed vcpkg ---
       - name: Install dependencies (Windows)
@@ -66,10 +66,9 @@ jobs:
       - name: Configure CMake (macOS)
         if: runner.os == 'macOS'
         run: |
-          export PATH="$(brew --prefix llvm)/bin:$PATH"
           cmake -B build \
-            -DCMAKE_C_COMPILER="$(brew --prefix llvm)/bin/clang" \
-            -DCMAKE_CXX_COMPILER="$(brew --prefix llvm)/bin/clang++" \
+            -DCMAKE_C_COMPILER=gcc-14 \
+            -DCMAKE_CXX_COMPILER=g++-14 \
             -DCMAKE_BUILD_TYPE=Release \
             -DBUILD_TESTING=OFF
 

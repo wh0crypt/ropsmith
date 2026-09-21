@@ -47,6 +47,7 @@ add_library(ropsmith_core STATIC ${CORE_SOURCES} ${HEADERS})
 
 target_include_directories(ropsmith_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
 )
 
 target_link_libraries(ropsmith_core PUBLIC

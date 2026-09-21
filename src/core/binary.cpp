@@ -19,8 +19,16 @@
 #include <format>
 #include <print>
 
-#if defined(__APPLE__) || defined(_WIN32)
+#if defined(__has_include)
+#if __has_include(<elf.h>)
+#include <elf.h>
+#elif __has_include("include/elf.h")
 #include "include/elf.h"
+#elif __has_include("elf.h")
+#include "elf.h"
+#else
+#error "Could not locate elf.h on this platform"
+#endif
 #else
 #include <elf.h>
 #endif // ELF headers

@@ -16,7 +16,6 @@
 #include "core/error.hpp"
 #include "utils/io.hpp"
 
-#include <elf.h>
 #include <expected>
 #include <print>
 
