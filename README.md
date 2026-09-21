@@ -13,7 +13,7 @@
 </pre>
 </div>
 
-![Lines of code](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/wh0crypt/b1eda9ea61ce8d4bb2c35622c375dafa/raw/ropsmith-cloc.json)
+![Lines of code](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/wh0crypt/b1eda9ea61ce8d4bb2c35622c375dafa/raw/ropsmith-cloc.json?cacheSeconds=300)
 [![build-dev](https://github.com/wh0crypt/ROPsmith/actions/workflows/build.yml/badge.svg)](https://github.com/wh0crypt/ROPsmith/actions/workflows/build.yml)
 [![build-release](https://github.com/wh0crypt/ROPsmith/actions/workflows/release.yml/badge.svg)](https://github.com/wh0crypt/ROPsmith/actions/workflows/release.yml)
 [![tests](https://github.com/wh0crypt/ROPsmith/actions/workflows/tests.yml/badge.svg)](https://github.com/wh0crypt/ROPsmith/actions/workflows/tests.yml)
