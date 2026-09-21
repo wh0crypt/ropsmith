@@ -1,0 +1,41 @@
+name: cloc
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+  workflow_dispatch:
+
+jobs:
+  count-loc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install dependencies
+        run: sudo apt-get install -y cloc jq
+
+      - name: Count code lines (excluding comments)
+        id: count
+        run: |
+          cloc --json --quiet --exclude-dir=.git,.github,tests,scripts,.idea,.cache --fullpath --not-match-d=src/include --include-ext=c,cc,cpp,h,hpp . > cloc.json
+          lines=$(jq '.SUM.code' cloc.json)
+          echo "lines=$lines" >> $GITHUB_OUTPUT
+
+      - name: Update Gist
+        uses: schneegans/dynamic-badges-action@v1.9.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: ${{ vars.GIST_ID }}
+          filename: ropsmith-cloc.json
+          label: lines of code
+          message: ${{ steps.count.outputs.lines }}
+          color: brightgreen
