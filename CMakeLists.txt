@@ -25,6 +25,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+option(BUILD_TESTING "Build the test suite" ON)
+
 # --------------------------------------------------------
 # Dependencies
 # --------------------------------------------------------
@@ -33,36 +35,42 @@ find_package(ZLIB REQUIRED)
 # --------------------------------------------------------
 # Source files
 # --------------------------------------------------------
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
-file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "src/include/*.h")
+file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
+list(FILTER CORE_SOURCES EXCLUDE REGEX ".*/main\\.cpp$")
+
+file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "src/include/*.h" "src/*.hpp")
 
 # --------------------------------------------------------
-# Executables
+# Core Library Target
 # --------------------------------------------------------
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+add_library(ropsmith_core STATIC ${CORE_SOURCES} ${HEADERS})
 
-# --------------------------------------------------------
-# Include directories
-# --------------------------------------------------------
-target_include_directories(${PROJECT_NAME} PRIVATE
+target_include_directories(ropsmith_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# --------------------------------------------------------
-# Libraries (Link ZLIB)
-# --------------------------------------------------------
-target_link_libraries(${PROJECT_NAME} PRIVATE
+target_link_libraries(ropsmith_core PUBLIC
     ZLIB::ZLIB
 )
 
 # --------------------------------------------------------
-# Compiler warnings
+# Main Executable
 # --------------------------------------------------------
+add_executable(${PROJECT_NAME} src/main.cpp)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ropsmith_core
+)
+
+# --------------------------------------------------------
+# Compiler warnings & Sanitizers (Interface Target)
+# --------------------------------------------------------
+add_library(ropsmith_compiler_flags INTERFACE)
+
 if (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /permissive-)
+    target_compile_options(ropsmith_compiler_flags INTERFACE /W4 /permissive-)
 else()
-    # Common warnings across GCC and Clang
-    target_compile_options(${PROJECT_NAME} PRIVATE
+    target_compile_options(ropsmith_compiler_flags INTERFACE
         -Wall
         -Wextra
         -Werror
@@ -81,9 +89,8 @@ else()
         -Wmisleading-indentation
     )
 
-    # GCC-only warnings (prevents Clang failures)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(${PROJECT_NAME} PRIVATE
+        target_compile_options(ropsmith_compiler_flags INTERFACE
             -Wduplicated-cond
             -Wduplicated-branches
             -Wlogical-op
@@ -91,12 +98,53 @@ else()
         )
     endif()
 
-    # Sanitizers for Debug builds only
-    target_compile_options(${PROJECT_NAME} PRIVATE
+    target_compile_options(ropsmith_compiler_flags INTERFACE
         $<$<CONFIG:Debug>:-g -O0 -fsanitize=address,undefined,leak>
         $<$<CONFIG:Release>:-O3>
     )
-    target_link_options(${PROJECT_NAME} PRIVATE
+    target_link_options(ropsmith_compiler_flags INTERFACE
         $<$<CONFIG:Debug>:-fsanitize=address,undefined,leak>
     )
+endif()
+
+# apply flags to library and binary
+target_link_libraries(ropsmith_core PUBLIC ropsmith_compiler_flags)
+target_link_libraries(${PROJECT_NAME} PRIVATE ropsmith_compiler_flags)
+
+# --------------------------------------------------------
+# Testing with Criterion
+# --------------------------------------------------------
+if (BUILD_TESTING)
+    find_package(PkgConfig QUIET)
+    if (PKG_CONFIG_FOUND)
+        pkg_check_modules(CRITERION criterion)
+    endif()
+
+    if (NOT CRITERION_FOUND)
+        find_path(CRITERION_INCLUDE_DIRS criterion/criterion.h)
+        find_library(CRITERION_LIBRARIES criterion)
+    endif()
+
+    if (CRITERION_LIBRARIES)
+        enable_testing()
+
+        file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "tests/*.cpp")
+
+        add_executable(test_binary ${TEST_SOURCES})
+
+        target_include_directories(test_binary PRIVATE
+            ${CRITERION_INCLUDE_DIRS}
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+        )
+
+        target_link_libraries(test_binary PRIVATE
+            ropsmith_core
+            ${CRITERION_LIBRARIES}
+            ropsmith_compiler_flags
+        )
+
+        add_test(NAME test_binary COMMAND test_binary --verbose)
+    else()
+        message(WARNING "Criterion library not found. Skipping test suite compilation.")
+    endif()
 endif()
