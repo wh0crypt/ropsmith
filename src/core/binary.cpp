@@ -33,12 +33,7 @@
 #include <elf.h>
 #endif // ELF headers
 
-#if defined(_WIN32)
-#include <windows.h>
-#include <winnt.h>
-#else
-#include "include/winnt_min.h"
-#endif // Windows headers
+#include "include/winnt_min.h" // Windows headers
 
 namespace file
 {
