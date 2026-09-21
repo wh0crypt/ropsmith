@@ -59,6 +59,12 @@ Binary::Binary(const std::filesystem::path &path)
 
 std::expected<void, std::string> Binary::load(const std::filesystem::path &path) noexcept
 {
+    std::error_code ec;
+    if (!std::filesystem::exists(path, ec) || ec)
+    {
+        return std::unexpected(std::format("file '{}' does not exist", path.string()));
+    }
+
     if (std::filesystem::is_empty(path))
     {
         return std::unexpected(
