@@ -36,68 +36,6 @@
 namespace file
 {
 
-std::string bin_type_to_string(const BinType &type)
-{
-    switch (type)
-    {
-        case BinType::ELF:
-            return "ELF";
-        case BinType::PE:
-            return "PE";
-        case BinType::MACHO:
-            return "Mach-O";
-        default:
-            return "Unknown";
-    }
-}
-
-std::string bitness_to_string(const Bitness &bitness)
-{
-    switch (bitness)
-    {
-        case Bitness::x32:
-            return "32-bit";
-        case Bitness::x64:
-            return "64-bit";
-        default:
-            return "Unknown";
-    }
-}
-
-std::string endian_to_string(const Endian &endian)
-{
-    switch (endian)
-    {
-        case Endian::LITTLE:
-            return "LSB";
-        case Endian::BIG:
-            return "MSB";
-        default:
-            return "Unknown";
-    }
-}
-
-std::string arch_to_string(const Arch &arch)
-{
-    switch (arch)
-    {
-        case Arch::x86:
-            return "x86";
-        case Arch::AMD64:
-            return "x86_64";
-        case Arch::ARM:
-            return "arm";
-        case Arch::AARCH64:
-            return "aarch64";
-        case Arch::RISCV:
-            return "riscv";
-        case Arch::MIPS:
-            return "mips";
-        default:
-            return "Unknown";
-    }
-}
-
 Binary::Binary()
 {
     this->path_ = std::filesystem::path();

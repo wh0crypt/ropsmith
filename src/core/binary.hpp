@@ -18,6 +18,7 @@
 #include <cstring>
 #include <expected>
 #include <filesystem>
+#include <string_view>
 #include <vector>
 
 //! \brief The file namespace contains classes and functions related to binary file handling.
@@ -61,10 +62,67 @@ enum class Arch
     MIPS
 };
 
-std::string bin_type_to_string(const BinType &type);
-std::string bitness_to_string(const Bitness &bitness);
-std::string endian_to_string(const Endian &endian);
-std::string arch_to_string(const Arch &arch);
+constexpr std::string_view bin_type_to_string(BinType type)
+{
+    switch (type)
+    {
+        case BinType::ELF:
+            return "ELF";
+        case BinType::PE:
+            return "PE";
+        case BinType::MACHO:
+            return "Mach-O";
+        default:
+            return "Unknown";
+    }
+}
+
+constexpr std::string_view bitness_to_string(Bitness bitness)
+{
+    switch (bitness)
+    {
+        case Bitness::x32:
+            return "32-bit";
+        case Bitness::x64:
+            return "64-bit";
+        default:
+            return "Unknown";
+    }
+}
+
+constexpr std::string_view endian_to_string(Endian endian)
+{
+    switch (endian)
+    {
+        case Endian::LITTLE:
+            return "LSB";
+        case Endian::BIG:
+            return "MSB";
+        default:
+            return "Unknown";
+    }
+}
+
+constexpr std::string_view arch_to_string(Arch arch)
+{
+    switch (arch)
+    {
+        case Arch::x86:
+            return "x86";
+        case Arch::AMD64:
+            return "x86_64";
+        case Arch::ARM:
+            return "arm";
+        case Arch::AARCH64:
+            return "aarch64";
+        case Arch::RISCV:
+            return "riscv";
+        case Arch::MIPS:
+            return "mips";
+        default:
+            return "Unknown";
+    }
+}
 
 //! \brief A class representing a binary file.
 class Binary
