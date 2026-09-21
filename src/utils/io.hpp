@@ -17,6 +17,7 @@
 #include "core/error.hpp"
 #include "macros.hpp"
 
+#include <bit>
 #include <filesystem>
 #include <print>
 #include <vector>

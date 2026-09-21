@@ -192,19 +192,27 @@ core::Result<unsigned long> compute_crc32(const std::vector<std::byte> &buf) noe
 
 core::Result<std::FILE *> open_binary(const std::filesystem::path &path) noexcept
 {
-#if defined(_WIN32)
-    std::FILE *file = _wfopen(path.c_str(), L"rb");
-#else
-    std::FILE *file = std::fopen(path.c_str(), "rb");
-#endif
+    std::FILE *file = nullptr;
 
-    if (!file)
+#if defined(_WIN32)
+    const errno_t err = _wfopen_s(&file, path.c_str(), L"rb");
+    if (err != 0 || file == nullptr)
+    {
+        std::error_code ec(err != 0 ? err : errno, std::generic_category());
+        return std::unexpected(
+            core::Error(ec, std::format("failed to open binary file '{}'", path.string()))
+        );
+    }
+#else
+    file = std::fopen(path.c_str(), "rb");
+    if (file == nullptr)
     {
         std::error_code ec(errno, std::generic_category());
         return std::unexpected(
             core::Error(ec, std::format("failed to open binary file '{}'", path.string()))
         );
     }
+#endif
 
     return file;
 }
