@@ -1,1 +1,1 @@
-src/include/** linguist-vendored
+src/include/** linguist-vendored linguist-detectable=false
